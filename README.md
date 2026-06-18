@@ -1,140 +1,51 @@
-# TrialScreen AI 🧬
-### Clinical Trial Patient Eligibility Screener & Site Feasibility Ranking Tool
+# TrialScreen — Clinical Trial Recruitment Tool
 
-A web-based platform that automates patient eligibility screening against clinical trial protocol criteria and ranks investigator sites by feasibility score — built to demonstrate core competencies in clinical trial operations.
+A web-based platform for screening patients against clinical trial eligibility criteria and ranking investigator sites by feasibility score.
 
----
-
-## 🎯 Purpose
-
-This project was built as a capstone to demonstrate understanding of clinical trial recruitment workflows relevant to **Clinical Trial Associate (CTA)** and **Clinical Research Associate (CRA)** roles.
-
-It mirrors two real-world tasks:
-1. **Patient eligibility screening** — checking inclusion/exclusion criteria against patient profiles (a core CTA responsibility)
-2. **Site feasibility assessment** — scoring and ranking potential investigator sites before trial initiation (a core CRA responsibility)
+Built as a portfolio project to demonstrate practical knowledge of clinical trial operations relevant to CTA and CRA roles.
 
 ---
 
-## 🔬 Protocol
+## What it does
 
-The tool screens patients against a simulated **Phase III NSCLC (Non-Small Cell Lung Cancer) trial** with:
+**Patient Screener**
+Checks a patient profile against inclusion and exclusion criteria from a Phase III NSCLC trial protocol. Returns an eligibility verdict, dropout risk level, and a clinical recommendation.
 
-**Inclusion Criteria**
-- Age 18–75 years
-- Histologically confirmed NSCLC Stage IIIB/IV
-- ECOG Performance Status 0–2
-- eGFR ≥ 50 mL/min (adequate renal function)
-- ALT/AST ≤ 2.5× ULN (adequate hepatic function)
-- No prior platinum-based chemotherapy
-- Life expectancy ≥ 12 weeks
+**Site Feasibility Ranking**
+Scores and ranks 6 international investigator sites using a weighted model across recruitment rate, patient pool size, prior trial experience, IRB approval speed, and patient proximity.
 
-**Exclusion Criteria**
-- Prior systemic treatment for advanced NSCLC
-- Active untreated CNS metastases
-- Pregnancy or breastfeeding
-- Active autoimmune disease requiring systemic treatment
+**Recruitment Dashboard**
+Tracks screening outcomes in real time — eligibility breakdown, dropout risk distribution, and a full screening log.
 
 ---
 
-## ⚙️ Features
+## Protocol
 
-### 1. Patient Screener
-- Enter patient demographic and clinical data
-- Rule-based eligibility engine checks all inclusion/exclusion criteria
-- Returns: **Eligible / Not Eligible / Requires Review**
-- Generates **dropout risk score** (Low / Moderate / High) based on ECOG status, eGFR, age, and life expectancy
-- Full criteria breakdown with pass/fail per criterion
-- Clinical recommendation for next steps
+Phase III — Advanced Non-Small Cell Lung Cancer (NSCLC), Stage IIIB/IV
 
-### 2. Site Feasibility Ranking
-Weighted scoring of 6 international investigator sites across:
+Inclusion: Age 18-75, ECOG 0-2, eGFR above 50, ALT/AST within 2.5x ULN, no prior platinum-based chemotherapy, life expectancy above 12 weeks.
 
-| Factor | Weight |
-|---|---|
-| Historical recruitment rate | 35% |
-| Patient pool size | 25% |
-| Number of prior trials | 20% |
-| IRB approval speed | 10% |
-| Distance from patient population | 10% |
-
-Sites include Royal Marsden (UK), Christie Hospital (UK), Hamad Medical (Qatar), Cleveland Clinic Abu Dhabi (UAE), Rigshospitalet (Denmark), and AIIMS (India).
-
-### 3. Recruitment Dashboard
-Live metrics tracking:
-- Total patients screened
-- Eligibility breakdown with visual funnel
-- Dropout risk distribution
-- Screening log with patient history
+Exclusion: Prior systemic treatment, active CNS metastases, pregnancy, active autoimmune disease.
 
 ---
 
-## 🛠️ Tech Stack
+## Tech
 
-- **React 18** — UI framework
-- **Vanilla CSS-in-JS** — no external CSS libraries
-- **Rule-based logic engine** — protocol eligibility assessment (no API dependency)
+React 18, rule-based eligibility engine, no external dependencies.
 
 ---
 
-## 🚀 Getting Started
+## Author
 
-```bash
-# Clone the repo
-git clone https://github.com/YOUR_USERNAME/trialscreen-ai.git
-cd trialscreen-ai
-
-# Install dependencies
-npm install
-
-# Run locally
-npm start
-```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Bashik
+MSc Advanced Drug Delivery, University of Strathclyde
+GCP ICH E6 (R3) Certified
 
 ---
 
-## 📋 Sample Test Cases
+## Disclaimer
 
-**Patient 1 — Expected: ELIGIBLE**
-| Field | Value |
-|---|---|
-| Age | 62 |
-| Diagnosis | NSCLC Adenocarcinoma |
-| Stage | Stage IV |
-| ECOG | 1 |
-| eGFR | 58 |
-| ALT | 1.8× ULN |
-| AST | 1.5× ULN |
-| Life Expectancy | 20 weeks |
-| Prior Chemo | No |
-| CNS Metastases | No |
-
-**Patient 2 — Expected: NOT ELIGIBLE (multiple failures)**
-| Field | Value |
-|---|---|
-| Age | 45 |
-| Diagnosis | NSCLC Squamous Cell |
-| Stage | Stage IIIB |
-| ECOG | 3 |
-| eGFR | 42 |
-| ALT | 3.2× ULN |
-| Prior Chemo | Yes |
-| CNS Metastases | Yes |
-| Autoimmune Disease | Yes |
-| Life Expectancy | 8 weeks |
-
----
-
-## 📚 Clinical Context
-
-This project applies knowledge from:
-- **ICH E6 (R3) GCP guidelines** — Good Clinical Practice principles underpinning eligibility and monitoring logic
-- **Risk-based monitoring** — dropout risk stratification reflects ICH E6 R3 RBM principles
-- **Site feasibility assessment** — standard pre-initiation CRA activity
-- **Protocol deviation prevention** — eligibility screening is the first line of defence against protocol deviations
-
----
+This tool uses simulated data for demonstration purposes only. Not intended for use in real clinical trials.
 
 ## 👤 Author
 

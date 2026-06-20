@@ -1,4 +1,90 @@
 import { useState } from "react";
+import * as XLSX from "xlsx";
+
+// ─── Excel Export (3 sheets) ───────────────────────────────────────────────
+function exportToExcel(history, scoredSites, protocol) {
+  if (history.length === 0) return;
+
+  const wb = XLSX.utils.book_new();
+
+  // ── Sheet 1: Patient Screening Log ──
+  const screeningData = [
+    ["Patient ID", "Age", "Diagnosis", "Protocol", "Verdict", "Dropout Risk", "Risk Reason", "Criteria Met", "Criteria Failed", "Recommendation"],
+    ...history.map(h => [
+      h.patientId,
+      h.age,
+      h.diagnosis,
+      h.protocol === "advanced" ? "Phase III NSCLC Stage IIIB/IV" : "Phase II NSCLC Stage I/II",
+      h.verdict,
+      h.dropoutRisk,
+      h.dropoutRiskReason,
+      (h.metCriteria || []).join("; "),
+      (h.failedCriteria || []).join("; "),
+      h.recommendation,
+    ])
+  ];
+  const ws1 = XLSX.utils.aoa_to_sheet(screeningData);
+  ws1["!cols"] = [10,6,22,28,14,14,40,60,60,50].map(w => ({ wch: w }));
+  XLSX.utils.book_append_sheet(wb, ws1, "Patient Screening Log");
+
+  // ── Sheet 2: Site Feasibility Ranking ──
+  const siteData = [
+    ["Rank", "Site", "Country", "Recruitment Rate (%)", "Patient Pool", "Prior Trials", "IRB Speed (weeks)", "Distance", "Feasibility Score"],
+    ...scoredSites.map((s, i) => [
+      i + 1,
+      s.name,
+      s.country,
+      s.recruitmentRate,
+      s.patientPool,
+      s.priorTrials,
+      s.irbSpeed,
+      s.distance,
+      s.score,
+    ])
+  ];
+  const ws2 = XLSX.utils.aoa_to_sheet(siteData);
+  ws2["!cols"] = [6,30,12,20,14,14,18,12,16].map(w => ({ wch: w }));
+  XLSX.utils.book_append_sheet(wb, ws2, "Site Feasibility Ranking");
+
+  // ── Sheet 3: Dashboard Summary ──
+  const eligible    = history.filter(h => h.verdict === "ELIGIBLE").length;
+  const notEligible = history.filter(h => h.verdict === "NOT ELIGIBLE").length;
+  const review      = history.filter(h => h.verdict === "REQUIRES REVIEW").length;
+  const lowRisk     = history.filter(h => h.dropoutRisk === "LOW").length;
+  const modRisk     = history.filter(h => h.dropoutRisk === "MODERATE").length;
+  const highRisk    = history.filter(h => h.dropoutRisk === "HIGH").length;
+
+  const summaryData = [
+    ["TrialScreen AI — Recruitment Summary Report"],
+    ["Generated", new Date().toLocaleDateString()],
+    ["Protocol", protocol.title],
+    ["Phase", protocol.phase],
+    ["Indication", protocol.indication],
+    [],
+    ["ELIGIBILITY BREAKDOWN"],
+    ["Metric", "Count", "Percentage"],
+    ["Total Screened",   history.length, "100%"],
+    ["Eligible",         eligible,       history.length ? Math.round(eligible/history.length*100)+"%" : "0%"],
+    ["Not Eligible",     notEligible,    history.length ? Math.round(notEligible/history.length*100)+"%" : "0%"],
+    ["Requires Review",  review,         history.length ? Math.round(review/history.length*100)+"%" : "0%"],
+    [],
+    ["DROPOUT RISK DISTRIBUTION"],
+    ["Risk Level", "Count", "Percentage"],
+    ["Low",      lowRisk, history.length ? Math.round(lowRisk/history.length*100)+"%" : "0%"],
+    ["Moderate", modRisk, history.length ? Math.round(modRisk/history.length*100)+"%" : "0%"],
+    ["High",     highRisk, history.length ? Math.round(highRisk/history.length*100)+"%" : "0%"],
+    [],
+    ["TOP RECOMMENDED SITE"],
+    ["Site",    scoredSites[0]?.name],
+    ["Country", scoredSites[0]?.country],
+    ["Score",   scoredSites[0]?.score],
+  ];
+  const ws3 = XLSX.utils.aoa_to_sheet(summaryData);
+  ws3["!cols"] = [28, 20, 12].map(w => ({ wch: w }));
+  XLSX.utils.book_append_sheet(wb, ws3, "Dashboard Summary");
+
+  XLSX.writeFile(wb, `TrialScreen_Report_${new Date().toISOString().slice(0,10)}.xlsx`);
+}
 
 // ─── Protocols ─────────────────────────────────────────────────────────────
 const PROTOCOLS = {
@@ -422,6 +508,19 @@ export default function App() {
         {/* DASHBOARD TAB */}
         {tab==="dashboard" && (
           <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr 1fr", gap:16 }}>
+
+            {/* Export Button */}
+            <div style={{ gridColumn:"span 4", display:"flex", justifyContent:"flex-end", marginBottom:4 }}>
+              <button onClick={() => exportToExcel(history, scoredSites, protocol)} disabled={history.length===0}
+                style={{
+                  padding:"9px 20px", borderRadius:8, border:"1px solid #1E2535", cursor: history.length===0 ? "not-allowed" : "pointer",
+                  background: history.length===0 ? "#111827" : "#1A2240",
+                  color: history.length===0 ? "#2A3350" : "#4F8EF7",
+                  fontSize:13, fontWeight:600, display:"flex", alignItems:"center", gap:8,
+                }}>
+                ↓ Export to Excel (.xlsx)
+              </button>
+            </div>
             {[
               { label:"Screened",          value:history.length, color:"#4F8EF7" },
               { label:"Eligible",          value:eligible,       color:"#00C48C" },
